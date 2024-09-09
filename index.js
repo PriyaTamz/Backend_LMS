@@ -1,38 +1,16 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const app = express();
+const app = require('./app');
 
-function getCurrentDateTime() {
-    const now = new Date();
-    return now.toString().replace(/[:.]/g, '-');
-}
+const mongoose = require('mongoose');
+const { MONGODB_URI } = require('./utils/config');
 
-app.post('/create-file', (req, res) => {
-    const currentDateTime = getCurrentDateTime();
-    const fileName = `files/${currentDateTime}.txt`;
-    const content = `Timestamp: ${currentDateTime}`;
+mongoose.connect(MONGODB_URI)
+    .then(() => {
+        console.log("Connected to the MongoDB database");
 
-    fs.writeFile(fileName, content, err => {
-        if (err) {
-            return res.status(500).send('Error writing file');
-        }
-        res.send(`File created: ${fileName}`);
+        app.listen(3001, () => {
+            console.log("Server is running on http://localhost:3001");
+        });
+    })
+    .catch((err) => {
+        console.log("Error connecting to the MongoDB database", err);
     });
-});
-
-app.get('/list-files', (req, res) => {
-    const directoryPath = 'files';
-    
-    fs.readdir(directoryPath, (err, files) => {
-        if (err) {
-            return res.status(500).send('Unable to scan directory');
-        }
-        const txtFiles = files.filter(file => path.extname(file) === '.txt');
-        res.send(txtFiles);
-    });
-});
-
-app.listen(3001, () => {
-    console.log('Server is running on http://localhost:3001');
-});
