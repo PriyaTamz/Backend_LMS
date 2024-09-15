@@ -8,7 +8,8 @@ authRouter.post('/register', authController.register);
 authRouter.post('/login', authController.login);
 authRouter.post('/logout', authController.logout);
 authRouter.get('/me', auth.isAuthenticated, authController.me);
-authRouter.post('/forgot-password', authController.requestPasswordReset); // Endpoint to request password reset
-authRouter.post('/reset-password', authController.resetPassword); // Endpoint to reset the password
+authRouter.post('/forgot-password', authController.requestPasswordReset);
+authRouter.post('/verify-otp', authController.verifyOtp);
+authRouter.post('/reset-password', authController.resetPassword);
 
 module.exports = authRouter;
