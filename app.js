@@ -9,7 +9,7 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-    origin: 'https://glittery-starburst-79895d.netlify.app/',
+    origin: 'https://glittery-starburst-79895d.netlify.app',
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
