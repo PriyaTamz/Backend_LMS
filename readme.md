@@ -31,12 +31,12 @@ This is the backend application for the Library Management System (LMS), built w
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/PriyaTamz/Library-Management-System---Backend.git
    ```
 
 2. Navigate into the project directory:
    ```bash
-   cd <nodejs-fsd61wde>
+   cd nodejs-fsd61wde
    ```
 
 3. Install dependencies:
