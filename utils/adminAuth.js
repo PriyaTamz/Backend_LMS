@@ -10,8 +10,7 @@ const auth = {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            jwt.verify(token, process.env.JWT_SECRET, (error, admin) => {
-                console.log("JWT_SECRET:", process.env.JWT_SECRET);
+            jwt.verify(token, JWT_SECRET, (error, admin) => {
 
                 if (error) {
                     return res.status(403).json({ message: 'Invalid token' });
