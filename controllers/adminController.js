@@ -45,7 +45,7 @@ const adminController = {
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: true,
-                sameSite: 'None',
+                sameSite: "None",
             });
 
             res.status(200).json({ message: 'Admin logged in successfully', token, adminId: admin._id});
