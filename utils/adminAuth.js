@@ -10,12 +10,14 @@ const auth = {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            jwt.verify(token, JWT_SECRET, (error, admin) => {
+            jwt.verify(token, process.env.JWT_SECRET, (error, admin) => {
+                console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
                 if (error) {
                     return res.status(403).json({ message: 'Invalid token' });
                 }
                 req.adminId = admin.id;
-                next(); 
+                next();
             });
         } catch (error) {
             res.status(500).json({ message: error.message });
