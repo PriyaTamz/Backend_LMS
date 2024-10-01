@@ -17,6 +17,10 @@ This is the backend application for the Library Management System (LMS), built w
   - Search, borrow, reserve, and return books.
   - Review management for books.
 
+- **Notification System**
+  - Users receive notifications for events such as successful borrowing, reservations, and overdue reminders.
+  - Admins can send system-wide announcements to all users.
+
 - **Reporting**
   - Generate reports for inventory, borrowing statistics, and user activity.
 
@@ -87,3 +91,9 @@ This is the backend application for the Library Management System (LMS), built w
 - `GET /report/inventory`: Get inventory report
 - `GET /report/borrowing-statistics`: Get borrowing statistics report
 - `GET /report/user-activity`: Get user activity report
+
+### Notification
+- `POST /notifications`: Create a notification (for user-specific events like borrowing or reserving)
+- `GET /notifications`: Get all notifications for the logged-in user
+- `PATCH /notifications/:id/read`: Mark a notification as read
+- `POST /admin/announcement`: Send a system-wide announcement to all users

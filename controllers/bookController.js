@@ -1,6 +1,7 @@
 const Book = require('../models/book');
 const BorrowTransaction = require('../models/borrowTransaction');
 const calculateDueDate = require('../utils/calculateDueDate');
+const Notification = require('../models/Notification');
 const User = require('../models/user');
 
 const bookController = {
@@ -209,6 +210,11 @@ const bookController = {
                 $push: { borrowedBooks: transaction._id }
             });
     
+            await Notification.create({
+                userId: req.user._id,
+                message: `You have successfully borrowed the book: ${book.title}. Due date: ${transaction.dueDate.toDateString()}.`
+            });
+            
             res.status(200).json({ message: "Book borrowed successfully", transaction });
         } catch (error) {
             console.error("Borrow book error:", error); 

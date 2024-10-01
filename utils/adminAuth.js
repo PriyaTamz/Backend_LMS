@@ -3,25 +3,6 @@ const { JWT_SECRET } = require('./config');
 const Admin = require('../models/admin');
 
 const auth = {
-    /*isAuthenticated: (req, res, next) => {
-        try {
-            const token = req.cookies.token;
-            if (!token) {
-                return res.status(401).json({ message: 'Unauthorized' });
-            }
-
-            jwt.verify(token, JWT_SECRET, (error, admin) => {
-
-                if (error) {
-                    return res.status(403).json({ message: 'Invalid token' });
-                }
-                req.adminId = admin.id;
-                next();
-            });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    },*/
     isAuthenticated: (req, res, next) => {
         try {
             const authHeader = req.headers.authorization;
@@ -29,7 +10,7 @@ const auth = {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
     
-            const token = authHeader.split(" ")[1]; // Extract token after "Bearer"
+            const token = authHeader.split(" ")[1]; 
             if (!token) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
@@ -38,8 +19,8 @@ const auth = {
                 if (error) {
                     return res.status(403).json({ message: 'Invalid token' });
                 }
-                req.adminId = admin.id;  // Attach the admin ID to the request
-                req.admin = admin;  // Attach the admin data to the request
+                req.adminId = admin.id; 
+                req.admin = admin; 
                 next();
             });
         } catch (error) {

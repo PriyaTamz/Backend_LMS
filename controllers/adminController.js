@@ -2,7 +2,7 @@ const Admin = require('../models/admin');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Book = require('../models/book');
-const BorrowTransaction = require('../models/borrowTransaction'); 
+const BorrowTransaction = require('../models/borrowTransaction');
 
 const adminController = {
     register: async (req, res) => {
@@ -48,7 +48,7 @@ const adminController = {
                 sameSite: "None",
             });
 
-            res.status(200).json({ message: 'Admin logged in successfully', token, adminId: admin._id});
+            res.status(200).json({ message: 'Admin logged in successfully', token, adminId: admin._id });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -73,12 +73,12 @@ const adminController = {
     getAdminProfile: async (req, res) => {
         try {
             const adminId = req.adminId;
-            const admin = await Admin.findById(adminId).select('-_id -password -__v -createdAt -updatedAt'); 
-    
+            const admin = await Admin.findById(adminId).select('-_id -password -__v -createdAt -updatedAt');
+
             if (!admin) {
                 return res.status(404).json({ message: 'Admin not found' });
             }
-    
+
             res.status(200).json({ admin });
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -99,11 +99,28 @@ const adminController = {
             }
 
             book.reviews = updatedReviews;
-            await book.save(); 
+            await book.save();
 
             res.status(200).json({ message: 'Review removed successfully.' });
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    },
+    sendAnnouncement: async (req, res) => {
+        const { message } = req.body;
+
+        try {
+            const users = await User.find();
+            await Promise.all(users.map(user => {
+                return Notification.create({
+                    userId: user._id,
+                    message
+                });
+            }));
+
+            res.status(200).json({ success: true, message: 'Announcement sent to all users.' });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 }
