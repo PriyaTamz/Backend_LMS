@@ -8,13 +8,13 @@ const userAuth = {
         try {
             console.log('Request headers:', req.headers); 
 
-            const token = req.cookies.token; 
+            /*const token = req.cookies.token; 
             if (!token) {
                 console.log('No token found in cookies');
                 return res.status(401).json({ message: 'Unauthorized' });
-            }
+            }*/
             
-            /*const authHeader = req.headers.authorization;
+            const authHeader = req.headers.authorization;
             if (!authHeader) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
@@ -22,7 +22,7 @@ const userAuth = {
             const token = authHeader.split(" ")[1];  
             if (!token) {
                 return res.status(401).json({ message: 'Unauthorized' });
-            }*/
+            }
     
             jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
                 if (error) {
