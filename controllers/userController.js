@@ -114,23 +114,34 @@ const userController = {
     getUserProfile: async (req, res) => {
         try {
             const userId = req.userId;
+            if (!userId) {
+                return res.status(400).json({ message: 'User ID is missing' });
+            }
+            
             const user = await User.findById(userId).select('-_id -password -__v -createdAt -updatedAt');
+
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
 
             const borrowingHistory = await BorrowTransaction.find({ userId })
             .populate('bookId', 'title dueDate')
             .select('borrowDate dueDate returnDate lateFee');
 
-            const reservedBooks = await Book.find({ reservedBy: userId }).select('title');
+            const reservedBooks = await Book.find({ reservedBy: userId }).select('title reservedDate');
 
-            const booksBorrowed = borrowingHistory.map(transaction => ({
+            const booksBorrowed = borrowingHistory
+            .filter(transaction => transaction.bookId)  // Only include transactions with valid bookId
+            .map(transaction => ({
                 bookTitle: transaction.bookId.title,
+                borrowDate: transaction.borrowDate,
                 dueDate: transaction.dueDate,
                 returnDate: transaction.returnDate,
                 lateFee: transaction.lateFee
             }));
 
             const overdueBooks = borrowingHistory
-            .filter(transaction => !transaction.returnDate && transaction.dueDate < new Date())
+            .filter(transaction => transaction.bookId && !transaction.returnDate && transaction.dueDate < new Date()) 
             .map(transaction => ({
                 bookTitle: transaction.bookId.title,
                 dueDate: transaction.dueDate
@@ -144,7 +155,8 @@ const userController = {
                 overdueNotifications: overdueBooks
             });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            console.error('Error fetching user profile:', error); 
+            res.status(500).json({ message: 'An error occurred while fetching the user profile.' });
         }
     },
     updateProfile: async (req, res) => {

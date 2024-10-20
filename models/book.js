@@ -28,6 +28,10 @@ const BookSchema = new mongoose.Schema({
         ref: 'User'
     },
     "genre": {
+        type: String,
+        enum: ['Fiction', 'Non-Fiction', 'Education']
+    },
+    "subcategory": {
         type: String
     },
     "publication_year": {
@@ -52,7 +56,10 @@ const BookSchema = new mongoose.Schema({
                 default: Date.now 
             }
         }
-    ]
+    ],
+    "reservedDate": { 
+        type: Date
+    }
 });
 
 module.exports = mongoose.model('Book', BookSchema, 'books');

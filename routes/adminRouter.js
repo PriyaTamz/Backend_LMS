@@ -15,5 +15,7 @@ adminRouter.post('/announcement', adminAuth.isAuthenticated, adminAuth.isAdmin, 
 
 adminRouter.delete('/delete-review/:bookId/:reviewId', adminAuth.isAuthenticated, adminAuth.isAdmin, adminController.deleteReview);
 
+adminRouter.get('/:id', adminAuth.isAuthenticated, adminAuth.isAdmin, adminController.viewBookDetailsAdmin);
+
 module.exports = adminRouter;
 

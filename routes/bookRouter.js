@@ -5,12 +5,17 @@ const userAuth = require('../utils/userAuth');
 
 const bookRouter = express.Router();
 
+bookRouter.get('/details/:id', bookController.viewBookDetails);
+bookRouter.get('/auth/details/:id', userAuth.isAuthenticated, bookController.viewBookDetailsAuthenticated);
+
 bookRouter.get('/search', bookController.searchByUsers);
 bookRouter.get('/check-borrowed/:id', userAuth.isAuthenticated, bookController.checkIfBookBorrowed);
 bookRouter.post('/borrow/:id', userAuth.isAuthenticated, bookController.borrowBook);
 bookRouter.get('/borrowed', userAuth.isAuthenticated, bookController.getBorrowedBooks);
 bookRouter.post('/return/:id', userAuth.isAuthenticated, bookController.returnBook);
 bookRouter.post('/reserve/:id', userAuth.isAuthenticated, bookController.reserveBook);
+
+bookRouter.post('/confirm-borrow/:bookId', userAuth.isAuthenticated, bookController.confirmBorrowBook);
 
 bookRouter.post('/:bookId/review', userAuth.isAuthenticated, bookController.submitReview);
 bookRouter.get('/:bookId/reviews', bookController.viewReviews);

@@ -6,9 +6,35 @@ const User = require('../models/user');
 
 const bookController = {
     addBooks: async (req, res) => {
+        const { title, author, ISBN, genre, publication_year } = req.body;
+
+        if (!ISBN) {
+            return res.status(400).json({ message: 'ISBN is required' });
+        }
+
+        try {
+            const book = new Book({
+                title,
+                author,
+                ISBN, 
+                genre,
+                publication_year
+            });
+
+            await book.save();
+            res.status(201).json({ message: 'Book added successfully', book });
+        } catch (error) {
+            if (error.code === 11000) {
+                res.status(400).json({ message: 'Duplicate ISBN', error: error.message });
+            } else {
+                res.status(500).json({ message: 'Error adding book', error: error.message });
+            }
+        }
+    },
+    /*addBooks: async (req, res) => {
         try {
             const books = req.body;
-            const savedBook = await Book.insertMany(books);
+            const savedBook = await Book.create(books);
             return res.status(201).json({ message: "Book(s) Created Successfully", savedBook });
         } catch (error) {
             if (error.code === 11000) {
@@ -16,7 +42,7 @@ const bookController = {
             }
             return res.status(500).json({ message: error.message });
         }
-    },
+    },*/
     updateBook: async (req, res) => {
         try {
             const { id } = req.params;
@@ -39,6 +65,35 @@ const bookController = {
             res.status(200).json(books);
         } catch (error) {
             return res.status(500).json({ message: error.message });
+        }
+    },
+    viewBookDetails: async (req, res) => {
+        try {
+            const { id } = req.params; 
+
+            const book = await Book.findById(id).populate('reviews.userId', 'name email'); 
+            if (!book) {
+                return res.status(404).json({ message: "Book not found" });
+            }
+
+            res.status(200).json(book);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+    viewBookDetailsAuthenticated: async (req, res) => {
+        try {
+            const { id } = req.params; 
+
+            const book = await Book.findById(id).populate('reviews.userId', 'name email'); 
+
+            if (!book) {
+                return res.status(404).json({ message: "Book not found" });
+            }
+
+            res.status(200).json(book);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
         }
     },
     deleteBook: async (req, res) => {
@@ -82,9 +137,10 @@ const bookController = {
             if (!book.reservedBy.includes(userId)) {
                 book.reservedBy.push(userId);
                 book.reserved = true;
+                book.reservedDate = new Date();
                 await book.save();
 
-                
+
                 const notification = new Notification({
                     userId,
                     message: `You have successfully reserved the book "${book.title}".`
@@ -190,7 +246,10 @@ const bookController = {
             }
 
             const userBorrowsBooks = await BorrowTransaction.countDocuments({ userId, returnDate: null });
-            if (userBorrowsBooks >= 5) {
+            console.log('books borrow count:', userBorrowsBooks);
+
+            const borrowingLimit = 5;
+            if (userBorrowsBooks >= borrowingLimit) {
                 return res.status(403).json({ message: "Book limit reached" });
             }
 
@@ -295,31 +354,37 @@ const bookController = {
 
             const book = await Book.findById(bookId);
 
+            // Update user's borrowedBooks
+            const user = await User.findById(userId);
+            user.borrowedBooks = user.borrowedBooks.filter(b => b.toString() !== bookId);
+            await user.save();
+
             if (book.reservedBy.length > 0) {
-
+                
                 const nextUserId = book.reservedBy.shift();
-                book.borrowedBy = nextUserId;
-                book.isAvailable = false;
-                book.reserved = true;
+                //book.borrowedBy = nextUserId;
+                book.isAvailable = true; // Mark the book available for reservation
+                book.reserved = false;
 
 
-                const newTransaction = new BorrowTransaction({
+                /*const newTransaction = new BorrowTransaction({
                     userId: nextUserId,
                     bookId: book._id,
                     borrowDate: new Date(),
                     dueDate: calculateDueDate()
                 });
 
-                await newTransaction.save();
+                await newTransaction.save();*/
 
-                // Create notification for the reserved user
+                
                 const notification = new Notification({
                     userId: nextUserId,
-                    message: `Your reserved book "${book.title}" is now available and Borrowed the book successfully`,
-                    createdAt: new Date()
+                    message: `The book "${book.title}" is now available. Would you like to borrow it?`,
+                    type: 'borrow-confirmation',
+                    createdAt: new Date(),
+                    bookId: book._id 
                 });
                 await notification.save();
-
 
             } else {
 
@@ -336,6 +401,46 @@ const bookController = {
             res.status(500).json({ message: error.message });
         }
     },
+    confirmBorrowBook: async (req, res) => {
+        try {
+            const { bookId } = req.params;
+            const userId = req.user.id;
+
+            const book = await Book.findById(bookId);
+            if (!book) {
+                return res.status(404).json({ message: "Book not found" });
+            }
+
+            if (!book.isAvailable) {
+                return res.status(400).json({ message: "Book is no longer available for borrowing" });
+            }
+
+            // Create a new borrow transaction
+            const transaction = new BorrowTransaction({
+                userId,
+                bookId: book._id,
+                borrowDate: new Date(),
+                dueDate: calculateDueDate()
+            });
+
+            await transaction.save();
+
+            book.isAvailable = false;
+            book.borrowedBy = userId;
+            await book.save();
+
+           
+            await Notification.create({
+                userId,
+                message: `You have successfully borrowed the book: "${book.title}". Due date: ${transaction.dueDate.toDateString()}.`,
+            });
+
+            res.status(200).json({ message: "Book borrowed successfully", transaction });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
     submitReview: async (req, res) => {
         try {
             const userId = req.userId;

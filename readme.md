@@ -2,28 +2,6 @@
 
 This is the backend application for the Library Management System (LMS), built with Node.js and Express. It provides RESTful API endpoints for managing users, books, reviews, and reports.
 
-## Features
-
-- **User Management**
-  - User registration and authentication.
-  - Profile management, including password reset functionality.
-  
-- **Admin Management**
-  - Admin registration, login, and profile management.
-  - Ability to delete user reviews.
-
-- **Book Management**
-  - CRUD operations for books (Create, Read, Update, Delete).
-  - Search, borrow, reserve, and return books.
-  - Review management for books.
-
-- **Notification System**
-  - Users receive notifications for events such as successful borrowing, reservations, and overdue reminders.
-  - Admins can send system-wide announcements to all users.
-
-- **Reporting**
-  - Generate reports for inventory, borrowing statistics, and user activity.
-
 ## Technologies Used
 
 - **Backend Framework**: Express.js
@@ -35,7 +13,7 @@ This is the backend application for the Library Management System (LMS), built w
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/PriyaTamz/Library-Management-System---Backend.git
+   git clone https://github.com/PriyaTamz/Backend_LMS.git
    ```
 
 2. Navigate into the project directory:
@@ -55,7 +33,8 @@ This is the backend application for the Library Management System (LMS), built w
 
 ## API Endpoints
 
-### User Routes
+### User Management
+#### User Routes
 - `POST /user/register`: Register a new user
 - `POST /user/login`: User login
 - `POST /user/logout`: User logout
@@ -66,15 +45,18 @@ This is the backend application for the Library Management System (LMS), built w
 - `POST /user/verify-otp`: Verify OTP for password reset
 - `POST /user/reset-password`: Reset user password
 
-### Admin Routes
+### Admin Management
+#### Admin Routes
 - `POST /admin/register`: Register a new admin
 - `POST /admin/login`: Admin login
 - `POST /admin/logout`: Admin logout
 - `GET /admin/me`: Get logged-in admin details
 - `GET /admin/profile`: Get admin profile
+- `POST /admin/announcement`: Send system-wide announcements to all users
 - `DELETE /admin/delete-review/:bookId/:reviewId`: Delete a specific review
 
-### Book Routes
+### Book Management
+#### Book Routes
 - `GET /books`: View all books
 - `GET /books/:id`: Get details of a specific book
 - `POST /books`: Add a new book
@@ -87,13 +69,14 @@ This is the backend application for the Library Management System (LMS), built w
 - `POST /books/:bookId/review`: Submit a review for a book
 - `GET /books/:bookId/reviews`: View reviews for a book
 
-### Report Routes
+### Reporting
+#### Report Routes
 - `GET /report/inventory`: Get inventory report
 - `GET /report/borrowing-statistics`: Get borrowing statistics report
 - `GET /report/user-activity`: Get user activity report
 
-### Notification
+### Notification System
+#### Notification
 - `POST /notifications`: Create a notification (for user-specific events like borrowing or reserving)
 - `GET /notifications`: Get all notifications for the logged-in user
-- `PATCH /notifications/:id/read`: Mark a notification as read
-- `POST /admin/announcement`: Send a system-wide announcement to all users
+- `DELETE /notifications/:id`: Mark a notification as read

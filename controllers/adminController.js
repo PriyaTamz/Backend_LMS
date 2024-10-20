@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Book = require('../models/book');
 const BorrowTransaction = require('../models/borrowTransaction');
+const User = require('../models/user');
+const Notification = require('../models/Notification'); 
+
 
 const adminController = {
     register: async (req, res) => {
@@ -108,7 +111,7 @@ const adminController = {
     },
     sendAnnouncement: async (req, res) => {
         const { message } = req.body;
-
+    
         try {
             const users = await User.find();
             await Promise.all(users.map(user => {
@@ -117,12 +120,30 @@ const adminController = {
                     message
                 });
             }));
-
+    
             res.status(200).json({ success: true, message: 'Announcement sent to all users.' });
         } catch (error) {
+            console.error('Error sending announcement:', error); 
             res.status(500).json({ success: false, message: error.message });
         }
-    }
+    },
+    viewBookDetailsAdmin: async (req, res) => {
+        try {
+            const { id } = req.params; 
+
+           
+            const book = await Book.findById(id).populate('reviews.userId', 'name email');
+
+            if (!book) {
+                return res.status(404).json({ message: "Book not found" });
+            }
+
+          
+            res.status(200).json(book);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
 }
 
 

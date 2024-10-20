@@ -14,7 +14,7 @@ const notificationController = {
     getUserNotifications: async (req, res) => {
         try {
             const userId = req.user.id;
-            const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }).limit(1);;
+            const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
             res.status(200).json({ success: true, notifications });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
@@ -22,8 +22,15 @@ const notificationController = {
     },
     markAsRead: async (req, res) => {
         try {
-            const notification = await Notification.findByIdAndUpdate(req.params.id, { isRead: true }, { new: true });
-            res.status(200).json({ success: true, notification });
+            const notification = await Notification.findByIdAndUpdate(req.params.id);
+
+            if (!notification) {
+                return res.status(404).json({ success: false, message: 'Notification not found' });
+            }
+            
+            await Notification.findByIdAndDelete(req.params.id);
+
+            res.status(200).json({ success: true, message: 'Notification deleted successfully' });
         } catch (error) {
             res.status(500).json({ success: false, message: error.message });
         }
