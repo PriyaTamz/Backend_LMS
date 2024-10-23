@@ -38,7 +38,7 @@ const userAuth = {
 }*/
     isAuthenticated: (req, res, next) => {
         try {
-            console.log('Request headers:', req.headers); // Log request headers for debugging
+            console.log('Request headers:', req.headers); 
 
             const authHeader = req.headers.authorization;
             if (!authHeader) {
@@ -46,27 +46,27 @@ const userAuth = {
                 return res.status(401).json({ message: 'Unauthorized: Authorization header missing' });
             }
 
-            const token = authHeader.split(" ")[1];  // Extract the token from the Bearer header
+            const token = authHeader.split(" ")[1]; 
             if (!token) {
                 console.log('Token missing from Authorization header');
                 return res.status(401).json({ message: 'Unauthorized: Token missing' });
             }
 
-            console.log('Extracted token:', token);  // Log token for debugging
+            console.log('Extracted token:', token);
 
             jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
                 if (error) {
-                    console.log('Token verification failed:', error);  // Log the specific JWT error
+                    console.log('Token verification failed:', error); 
                     return res.status(403).json({ message: 'Forbidden: Invalid or expired token' });
                 }
-                console.log('Verified user:', user);  // Log the decoded user object
+                console.log('Verified user:', user); 
 
                 req.userId = user.id;
-                req.user = user;  // Assign the decoded user to the request object
-                next();  // Proceed to the next middleware or route handler
+                req.user = user;  
+                next(); 
             });
         } catch (error) {
-            console.error('Authentication middleware error:', error);  // Log any unexpected error
+            console.error('Authentication middleware error:', error); 
             res.status(500).json({ message: 'Internal Server Error: ' + error.message });
         }
     }

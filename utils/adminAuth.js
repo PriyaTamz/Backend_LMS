@@ -9,24 +9,24 @@ const auth = {
 
             let token;
 
-            // Check if token is provided in cookies
+           
             if (req.cookies && req.cookies.token) {
                 token = req.cookies.token;
             } else {
-                // Check if Authorization header exists
+                
                 const authHeader = req.headers.authorization;
                 if (authHeader) {
-                    token = authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
+                    token = authHeader.split(" ")[1]; 
                 }
             }
 
-            // If no token is found, return unauthorized error
+            
             if (!token) {
                 console.log('No token found in cookies or Authorization header');
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            // Verify the token
+            
             jwt.verify(token, process.env.JWT_SECRET, (error, admin) => {
                 if (error) {
                     return res.status(403).json({ message: 'Invalid token' });
