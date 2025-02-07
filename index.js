@@ -6,6 +6,8 @@ const { MONGODB_URI } = require('./utils/config');
 mongoose.connect(MONGODB_URI)
     .then(() => {
         console.log("Connected to the MongoDB database");
+        //console.log("MONGODB_URI:", process.env.MONGODB_URI);
+
 
         app.listen(3001, () => {
             console.log("Server is running on http://localhost:3001");
