@@ -110,7 +110,9 @@ const bookController = {
     },
     viewAllBooks: async (req, res) => {
         try {
+            //console.log("GET /books endpoint hit");
             const books = await Book.find().populate('borrowedBy', 'name');
+            //console.log("Books fetched:", books);
             if (!books || books.length === 0) {
                 return res.status(404).json({ message: "No books found" });
             }
